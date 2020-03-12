@@ -1,18 +1,49 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { Form } from '@unform/web';
+import * as Yup from 'yup';
+import Input from '../../components/Input';
 
 import logo from '../../assets/logo.svg';
 
 export default function SignIn() {
+  const formRef = useRef(null);
+  async function handleSubmitLogin(data, { reset }) {
+    try {
+      const schema = Yup.object().shape({
+        email: Yup.string()
+          .email('E-mail inválido')
+          .required('E-mail é obrigatório'),
+        password: Yup.string()
+          .min(6, 'Minimo 6 caracteres')
+          .required('Senha é obrigatória'),
+      });
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+      reset();
+      formRef.current.setErrors({});
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        const errorMessages = {};
+
+        error.inner.forEach(err => {
+          errorMessages[err.path] = err.message;
+        });
+
+        formRef.current.setErrors(errorMessages);
+      }
+    }
+  }
   return (
     <>
       <img src={logo} alt="" />
-      <form action="">
-        <input type="email" name="email" placeholder="Seu e-mail" />
-        <input type="password" name="password" placeholder="Sua senha" />
+      <Form ref={formRef} onSubmit={handleSubmitLogin}>
+        <Input type="email" name="email" placeholder="Seu e-mail" />
+        <Input type="password" name="password" placeholder="Sua senha" />
         <button type="submit">Acessar</button>
         <Link to="/register">Criar conta gratuita</Link>
-      </form>
+      </Form>
     </>
   );
 }
