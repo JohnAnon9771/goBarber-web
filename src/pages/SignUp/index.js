@@ -1,13 +1,17 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
+
 import Input from '../../components/Input';
 
 import logo from '../../assets/logo.svg';
+import { signUpRequest } from '../../store/modules/auth/actions';
 
 export default function SignUp() {
   const formRef = useRef(null);
+  const dispatch = useDispatch();
   async function handleSubmit(data, { reset }) {
     try {
       const schema = Yup.object().shape({
@@ -25,6 +29,8 @@ export default function SignUp() {
 
       reset();
       formRef.current.setErrors({});
+      const { name, email, password } = data;
+      dispatch(signUpRequest(name, email, password));
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         const errorMessages = {};

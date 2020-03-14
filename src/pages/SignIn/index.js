@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
@@ -13,6 +13,7 @@ import logo from '../../assets/logo.svg';
 export default function SignIn() {
   const formRef = useRef(null);
   const dispatch = useDispatch();
+  const loading = useSelector(state => state.auth.loading);
 
   async function handleSubmitLogin(data, { reset }) {
     try {
@@ -29,6 +30,9 @@ export default function SignIn() {
       });
       reset();
       formRef.current.setErrors({});
+
+      const { email, password } = data;
+      dispatch(signInRequest(email, password));
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         const errorMessages = {};
@@ -40,8 +44,6 @@ export default function SignIn() {
         formRef.current.setErrors(errorMessages);
       }
     }
-    const { email, password } = data;
-    dispatch(signInRequest(email, password));
   }
   return (
     <>
@@ -49,7 +51,7 @@ export default function SignIn() {
       <Form ref={formRef} onSubmit={handleSubmitLogin}>
         <Input type="email" name="email" placeholder="Seu e-mail" />
         <Input type="password" name="password" placeholder="Sua senha" />
-        <button type="submit">Acessar</button>
+        <button type="submit">{loading ? 'Carregando...' : 'Acessar'}</button>
         <Link to="/register">Criar conta gratuita</Link>
       </Form>
     </>
