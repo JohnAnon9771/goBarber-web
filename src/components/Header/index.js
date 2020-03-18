@@ -8,7 +8,12 @@ import Notification from '../Notification';
 import { Container, Content, Profile } from './styles';
 
 export default function Header() {
-  const user = useSelector(state => state.user.profile);
+  const { name, avatar } = useSelector(state => {
+    return {
+      name: state.user.profile.name,
+      avatar: state.user.profile.avatar,
+    };
+  });
   return (
     <Container>
       <Content>
@@ -20,11 +25,14 @@ export default function Header() {
           <Notification />
           <Profile>
             <div>
-              <strong>{user.name}</strong>
+              <strong>{name}</strong>
               <Link to="/profile">Meu perfil</Link>
             </div>
             <img
-              src="https://api.adorable.io/avatars/50/abott@adorable.png"
+              src={
+                avatar.url ||
+                'https://api.adorable.io/avatars/50/abott@adorable.png'
+              }
               alt=""
             />
           </Profile>
